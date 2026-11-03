@@ -1,18 +1,33 @@
 use crate::*;
 
+#[derive(Debug, Clone, Copy)]
+pub enum Status {
+    OK,
+    NotFound,
+}
+
+impl core::fmt::Display for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Status::OK => write!(f, "200 OK"),
+            Status::NotFound => write!(f, "404 NOT_FOUND"),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct Response {
     pub protocol: String,
-    pub status: String,
+    pub status: Status,
     pub headers: Headers,
     pub content: String,
 }
 
 impl Response {
-    pub fn new(protocol: &str, status: &str, content: &str) -> Self {
+    pub fn new(protocol: &str, status: &Status, content: &str) -> Self {
         Self {
             protocol: protocol.to_string(),
-            status: status.to_string(),
+            status: *status,
             headers: Headers::new(),
             content: content.to_string(),
         }

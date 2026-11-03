@@ -40,10 +40,10 @@ fn handle_connection(mut stream: std::net::TcpStream) -> std::io::Result<()> {
 
     let protocol = request.protocol.clone();
     let response = match request.path.segments().as_slice() {
-        [] => Response::new(&protocol, "200 OK", ""),
+        [] => Response::new(&protocol, &Status::OK, ""),
 
         ["echo", str] => {
-            let mut response = Response::new(&protocol, "200 OK", str);
+            let mut response = Response::new(&protocol, &Status::OK, str);
             response.add_header("Content-Type", "text/plain");
             response.add_header("Content-Length", &response.content.len().to_string());
 
@@ -52,14 +52,14 @@ fn handle_connection(mut stream: std::net::TcpStream) -> std::io::Result<()> {
 
         ["user-agent"] => {
             let mut response =
-                Response::new(&protocol, "200 OK", &request.headers.get("User-Agent"));
+                Response::new(&protocol, &Status::OK, &request.headers.get("User-Agent"));
             response.add_header("Content-Type", "text/plain");
             response.add_header("Content-Length", &response.content.len().to_string());
 
             response
         }
 
-        _ => Response::new(&protocol, "404 NOT_FOUND", ""),
+        _ => Response::new(&protocol, &Status::NotFound, ""),
     };
 
     stream.write_all(response.raw().as_bytes())
